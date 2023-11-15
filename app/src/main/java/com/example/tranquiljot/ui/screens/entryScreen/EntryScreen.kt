@@ -4,16 +4,14 @@ package com.example.tranquiljot.ui.screens.entryScreen
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.material3.IconButton
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,7 +22,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Done
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
@@ -47,7 +48,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -55,7 +55,6 @@ import androidx.navigation.NavHostController
 import com.example.tranquiljot.R
 import com.example.tranquiljot.ui.screens.AppViewModelInitializer
 import java.time.LocalDateTime
-import java.time.LocalTime
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -71,6 +70,10 @@ fun EntryScreen(
     val focusRequester = remember {
         FocusRequester()
     }
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+    val time = LocalDateTime.now()
     val focusManager = LocalFocusManager.current
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -86,12 +89,14 @@ fun EntryScreen(
         exit = fadeOut()
     ) {
 
-        Column(modifier = Modifier.padding(16.dp).pointerInput(Unit) {
-            detectTapGestures {
-                keyboardController?.hide()
-                focusManager.clearFocus()
-            }
-        }) {
+        Column(modifier = Modifier
+            .padding(16.dp)
+            .pointerInput(Unit) {
+                detectTapGestures {
+                    keyboardController?.hide()
+                    focusManager.clearFocus()
+                }
+            }) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -113,8 +118,15 @@ fun EntryScreen(
                     SaveButton {
                         savedNote = true
                         keyboardController?.hide()
-                        focusRequester.freeFocus()
                         focusManager.clearFocus(force = true)
+                    }
+                    Box {
+                        MenuTagsButton {
+                            expanded = true
+                        }
+                        if (expanded) {
+                            MenuList(expanded = expanded, dismissMenu = { expanded = false})
+                        }
                     }
                 }
             }
@@ -123,7 +135,7 @@ fun EntryScreen(
 
             }
 
-            val time = LocalDateTime.now()
+
             Text(
                 text = "${time.dayOfMonth} ${getMonth(time.monthValue)} ${time.hour}:${time.minute}",
                 modifier = Modifier.padding(vertical = 4.dp),
@@ -173,6 +185,32 @@ fun TitleField (modifier: Modifier, focusRequester: FocusRequester, titleUpdate:
     )
 }
 
+@Composable
+fun MenuList(expanded: Boolean, dismissMenu: () -> Unit) {
+    DropdownMenu(expanded = expanded, onDismissRequest = { dismissMenu() }) {
+        DropdownMenuItem(
+            text = {
+                   Text(text = "Tags")
+            },
+            onClick = {
+
+            }
+        )
+    }
+}
+@Composable
+fun MenuTagsButton(showTags: () -> Unit) {
+    FilledIconButton(
+        onClick = {
+            showTags()
+        }
+    ) {
+        Icon(
+            imageVector = Icons.Filled.MoreVert,
+            contentDescription = "Menu"
+        )
+    }
+}
 @Composable
 fun BackButton(backToHome: () -> Unit) {
     FilledIconButton(
