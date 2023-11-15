@@ -41,8 +41,7 @@ fun NavigationGraph(navController: NavHostController) {
             }))
         }
         composable(route = Screens.ENTRY.name) {
-            EntryScreen()
+            EntryScreen (navController = navController)
         }
-
     }
 }

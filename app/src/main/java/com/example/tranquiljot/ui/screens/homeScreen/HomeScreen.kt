@@ -1,5 +1,7 @@
 package com.example.tranquiljot.ui.screens.homeScreen
 
+import androidx.compose.material.icons.filled.Create
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.runtime.remember
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.AlertDialog
@@ -18,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,6 +49,11 @@ fun HomeScreen(
         topBar = {
             AppBar()
         },
+        floatingActionButton = {
+            HomeFloatingActionButton {
+                navigateEntry()
+            }
+        },
         modifier = Modifier.padding(16.dp)
     ) {paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
@@ -54,6 +62,25 @@ fun HomeScreen(
     }
 }
 
+
+
+/**
+ *  Floating Action Button
+ * */
+
+@Composable
+fun HomeFloatingActionButton(toEntry: () -> Unit) {
+    FloatingActionButton(
+        onClick = {
+            toEntry()
+        }
+    ) {
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = "Create"
+        )
+    }
+}
 
 // filter row for the home screen
 @Composable
