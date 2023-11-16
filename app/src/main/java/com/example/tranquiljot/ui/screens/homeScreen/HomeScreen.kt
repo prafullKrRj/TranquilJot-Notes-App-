@@ -101,10 +101,22 @@ fun HomeScreen(
 fun getNote(string: String) : String{
     val arr = string.split(" ", "\n\n")
     val usefulString = StringBuilder("")
+    var countn: Int = 0
     for (i in arr) {
         if (i != " ") {
+
             usefulString.append(i).append(" ")
         }
+        if (i == "\n") countn++
+    }
+    if (countn > 5) {
+        var k = 0
+        var i = 0
+        while (k < 3 && i < usefulString.length) {
+            if (usefulString[i].toString() == "\n") k++
+            i++;
+        }
+        return usefulString.substring(0, i)+".."
     }
     return usefulString.toString()
 }

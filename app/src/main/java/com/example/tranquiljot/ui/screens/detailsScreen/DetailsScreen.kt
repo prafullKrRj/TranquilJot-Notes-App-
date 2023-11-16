@@ -15,10 +15,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -46,47 +51,64 @@ fun DetailsScreen(
     val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    Column(modifier = Modifier
-        .padding(16.dp)
-        .pointerInput(Unit) {
-            detectTapGestures {
-                keyboardController?.hide()
-                focusManager.clearFocus()
-            }
-        }) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            BackButton {
-                navHostController.navigateUp()
-            }
-            Row(
-                modifier = Modifier,
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.End)
-            ) {
-                ShareButton {
-                    focusManager.clearFocus()
-                }
-                SaveButton {
-                    keyboardController?.hide()
-                    coroutineScope.launch {
-                        viewModel.updateNote()
-                    }
-                    focusManager.clearFocus()
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        DetailTitleField(noteDetails = viewModel.noteUiState.noteDetails, modifier = Modifier) {
-            viewModel.updateUiState(it)
-        }
+    val snackbarHostState = remember { SnackbarHostState() }
 
-        Spacer(modifier = Modifier.height(8.dp))
-        DetailsNoteField(noteDetails = viewModel.noteUiState.noteDetails, modifier = Modifier.fillMaxSize()) {
-            viewModel.updateUiState(it)
+    Scaffold (
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
+        }
+    ){ paddingValues ->
+
+        Column(modifier = Modifier
+            .padding(16.dp)
+            .padding(paddingValues)
+            .pointerInput(Unit) {
+                detectTapGestures {
+                    keyboardController?.hide()
+                    focusManager.clearFocus()
+                }
+            }) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                BackButton {
+                    navHostController.navigateUp()
+                }
+                Row(
+                    modifier = Modifier,
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.End)
+                ) {
+                    ShareButton {
+                        focusManager.clearFocus()
+                    }
+                    SaveButton {
+                        keyboardController?.hide()
+                        coroutineScope.launch {
+                            viewModel.updateNote()
+                            snackbarHostState.showSnackbar(
+                                message = "Note Updated",
+                            )
+                        }
+                        focusManager.clearFocus()
+
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            DetailTitleField(noteDetails = viewModel.noteUiState.noteDetails, modifier = Modifier) {
+                viewModel.updateUiState(it)
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            DetailsNoteField(
+                noteDetails = viewModel.noteUiState.noteDetails,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                viewModel.updateUiState(it)
+            }
         }
     }
 }
