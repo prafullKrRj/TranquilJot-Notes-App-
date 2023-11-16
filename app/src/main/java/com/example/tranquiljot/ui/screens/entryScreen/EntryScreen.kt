@@ -2,8 +2,6 @@
 
 package com.example.tranquiljot.ui.screens.entryScreen
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -54,11 +52,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.tranquiljot.ui.screens.AppViewModelInitializer
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
 
 
 @OptIn(ExperimentalComposeUiApi::class)
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun EntryScreen(
     viewModel: EntryScreenViewModel = viewModel(factory = AppViewModelInitializer.Factory),
@@ -72,7 +68,6 @@ fun EntryScreen(
     var expanded by remember {
         mutableStateOf(false)
     }
-    val time = LocalDateTime.now()
     val focusManager = LocalFocusManager.current
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -131,7 +126,7 @@ fun EntryScreen(
                 viewModel.updateUiState(it)
             }
             Text(
-                text = "${time.dayOfMonth} ${getMonth(time.monthValue)} ${time.hour}:${time.minute}",
+                text = getTime(),
                 modifier = Modifier.padding(vertical = 4.dp),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium
@@ -244,32 +239,3 @@ fun SaveButton(saveNote: () -> Unit) {
         )
     }
 }
-
-
-private fun getMonth(mon: Int) : String {
-    return when (mon) {
-        1 -> "January"
-        2 -> "February"
-        3 -> "March"
-        4 -> "April"
-        5 -> "May"
-        6 -> "June"
-        7 -> "July"
-        8 -> "August"
-        9 -> "September"
-        10 -> "October"
-        11 -> "November"
-        else -> "December"
-    }
-}
-
-
-
-
-
-
-
-
-
-
-

@@ -9,5 +9,6 @@ data class Notes(
     val id: Int,
     val title: String,
     val note: String,
-    val time: String
+    val time: String,
+    val timeStamp: Long
 )

@@ -9,6 +9,7 @@ import com.example.tranquiljot.data.NotesRepository
 import com.example.tranquiljot.model.Notes
 import com.example.tranquiljot.ui.screens.entryScreen.NoteDetails
 import com.example.tranquiljot.ui.screens.entryScreen.NoteUiState
+import com.example.tranquiljot.ui.screens.entryScreen.getTime
 import com.example.tranquiljot.ui.screens.entryScreen.toNotes
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -28,6 +29,8 @@ class DetailsScreenViewModel(
         }
     }
     suspend fun updateNote() {
+        noteUiState.noteDetails.time = getTime()
+        noteUiState.noteDetails.timeStamp = System.currentTimeMillis()
         if (validateInput(noteUiState.noteDetails)) {
             notesRepository.updateNotes(noteUiState.noteDetails.toNotes())
         }
@@ -52,5 +55,6 @@ fun Notes.toNoteDetails() : NoteDetails = NoteDetails(
     id = id,
     title = title,
     note = note,
-    time = time
+    time = time,
+    timeStamp = timeStamp
 )
