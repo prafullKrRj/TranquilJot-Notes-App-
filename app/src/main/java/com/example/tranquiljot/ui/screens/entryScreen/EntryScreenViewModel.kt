@@ -56,8 +56,7 @@ fun NoteDetails.toNotes() : Notes {
         timeStamp = timeStamp
     )
 }
-fun getTime() : String {
-    val time = LocalDateTime.now()
+fun getTime(time: LocalDateTime = LocalDateTime.now()) : String {
     val formatter = DateTimeFormatter.ofPattern("hh:mm a")
     val formattedTime = time.format(formatter)
     return ("${time.dayOfMonth} ${getMonth(time.monthValue)} ${formattedTime.uppercase()}")

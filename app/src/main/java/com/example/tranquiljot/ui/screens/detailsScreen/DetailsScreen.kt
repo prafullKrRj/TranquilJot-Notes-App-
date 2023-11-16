@@ -2,6 +2,9 @@
 
 package com.example.tranquiljot.ui.screens.detailsScreen
 
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,7 +19,6 @@ import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -31,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -43,6 +46,7 @@ import com.example.tranquiljot.ui.screens.entryScreen.SaveButton
 import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun DetailsScreen(
     navHostController: NavHostController,
@@ -52,7 +56,15 @@ fun DetailsScreen(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val snackbarHostState = remember { SnackbarHostState() }
+    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult(), onResult = {
 
+    })
+    LocalContext.current
+    val shareIntent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_TEXT, getText(viewModel.noteUiState.noteDetails))
+        type = "text/plain"
+    }
     Scaffold (
         snackbarHost = {
             SnackbarHost(snackbarHostState)
@@ -83,6 +95,7 @@ fun DetailsScreen(
                 ) {
                     ShareButton {
                         focusManager.clearFocus()
+                        launcher.launch(Intent.createChooser(shareIntent, "Share Via"))
                     }
                     SaveButton {
                         keyboardController?.hide()
@@ -112,8 +125,12 @@ fun DetailsScreen(
         }
     }
 }
+fun getText(noteDetails: NoteDetails) : String {
+    return "Title: "+noteDetails.title+"\nNote: "+noteDetails.note+"\n\nDate: "+ noteDetails.time
+}
 @Composable
 fun ShareButton(shareNote: () -> Unit) {
+
     FilledTonalIconButton(
         onClick = {
             shareNote()
@@ -125,6 +142,7 @@ fun ShareButton(shareNote: () -> Unit) {
         )
     }
 }
+
 @Composable
 fun DetailTitleField(
     noteDetails: NoteDetails,
