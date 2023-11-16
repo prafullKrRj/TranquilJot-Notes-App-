@@ -68,13 +68,14 @@ fun DetailsScreen(
                 horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.End)
             ) {
                 ShareButton {
-
+                    focusManager.clearFocus()
                 }
                 SaveButton {
                     keyboardController?.hide()
                     coroutineScope.launch {
                         viewModel.updateNote()
                     }
+                    focusManager.clearFocus()
                 }
             }
         }
