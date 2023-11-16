@@ -6,10 +6,12 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.Spring.DampingRatioLowBouncy
+import androidx.compose.animation.core.Spring.StiffnessMedium
 import androidx.compose.animation.core.Spring.StiffnessVeryLow
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -98,28 +100,8 @@ fun HomeScreen(
  *
  *  Body of the home screen
  * */
-fun getNote(string: String) : String{
-    val arr = string.split(" ", "\n\n")
-    val usefulString = StringBuilder("")
-    var countn: Int = 0
-    for (i in arr) {
-        if (i != " ") {
 
-            usefulString.append(i).append(" ")
-        }
-        if (i == "\n") countn++
-    }
-    if (countn > 5) {
-        var k = 0
-        var i = 0
-        while (k < 3 && i < usefulString.length) {
-            if (usefulString[i].toString() == "\n") k++
-            i++;
-        }
-        return usefulString.substring(0, i)+".."
-    }
-    return usefulString.toString()
-}
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HomeBody(noteList: List<Notes>, navigateDetails: (Int) -> Unit = {}, deleteCard: (Int) -> Unit) {
     val visibleState = remember {
@@ -138,12 +120,12 @@ fun HomeBody(noteList: List<Notes>, navigateDetails: (Int) -> Unit = {}, deleteC
                 item {
                     NoteCard(
                         modifier = Modifier.animateEnterExit(
-                            enter = slideInVertically(
+                            enter = slideInHorizontally(
                                 animationSpec = spring(
                                     dampingRatio = DampingRatioLowBouncy,
                                     stiffness = StiffnessVeryLow
                                 ),
-                                initialOffsetY = { it * (index + 1) },
+                                initialOffsetX = { -it },
                             )
                         ),
                         note = note,
@@ -250,9 +232,6 @@ fun FilterRow() {
             )
         }
     }
-    if (isFiltering) {
-
-    }
 }
 // App bar for the home screen
 @Composable
@@ -281,9 +260,25 @@ fun RoundIcon() {
         Image(painter = painterResource(id = R.drawable.notes), contentDescription = "Notes logo")      // TODO: Add logo
     }
 }
+fun getNote(string: String) : String{
+    val arr = string.split(" ", "\n\n")
+    val usefulString = StringBuilder("")
+    var countn = 0
+    for (i in arr) {
+        if (i != " ") {
 
-
-
-
-
-
+            usefulString.append(i).append(" ")
+        }
+        if (i == "\n") countn++
+    }
+    if (countn > 5) {
+        var k = 0
+        var i = 0
+        while (k < 3 && i < usefulString.length) {
+            if (usefulString[i].toString() == "\n") k++
+            i++
+        }
+        return usefulString.substring(0, i)+".."
+    }
+    return usefulString.toString()
+}

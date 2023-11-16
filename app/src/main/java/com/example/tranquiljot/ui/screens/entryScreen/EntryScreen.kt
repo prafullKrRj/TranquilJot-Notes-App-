@@ -9,7 +9,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -111,18 +110,22 @@ fun EntryScreen(
                         }
                         navController.navigateUp()
                     }
-                 /*   Box {
-                        MenuTagsButton {
-                            expanded = true
-                        }
-                        if (expanded) {
-                            MenuList(expanded = expanded, dismissMenu = { expanded = false})
-                        }
-                    }*/
+                    /*   Box {
+                    MenuTagsButton {
+                        expanded = true
+                    }
+                    if (expanded) {
+                        MenuList(expanded = expanded, dismissMenu = { expanded = false})
+                    }
+                }*/
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-            TitleField(noteDetails = viewModel.noteUiState.noteDetails, modifier = Modifier, focusRequester = focusRequester) {
+            TitleField(
+                noteDetails = viewModel.noteUiState.noteDetails,
+                modifier = Modifier,
+                focusRequester = focusRequester
+            ) {
                 viewModel.updateUiState(it)
             }
             Text(
@@ -132,11 +135,15 @@ fun EntryScreen(
                 fontWeight = FontWeight.Medium
             )
             Spacer(modifier = Modifier.height(8.dp))
-            EntryNoteField(noteDetails = viewModel.noteUiState.noteDetails, modifier = Modifier.fillMaxSize()) {
+            EntryNoteField(
+                noteDetails = viewModel.noteUiState.noteDetails,
+                modifier = Modifier.fillMaxSize()
+            ) {
                 viewModel.updateUiState(it)
             }
         }
-    }
+
+}
 }
 
 @Composable
