@@ -111,14 +111,14 @@ fun EntryScreen(
                         }
                         navController.navigateUp()
                     }
-                    Box {
+                 /*   Box {
                         MenuTagsButton {
                             expanded = true
                         }
                         if (expanded) {
                             MenuList(expanded = expanded, dismissMenu = { expanded = false})
                         }
-                    }
+                    }*/
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
