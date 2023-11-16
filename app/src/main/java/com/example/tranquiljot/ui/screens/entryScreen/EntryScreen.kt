@@ -36,6 +36,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -46,26 +47,24 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.tranquiljot.R
 import com.example.tranquiljot.ui.screens.AppViewModelInitializer
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun EntryScreen(
     viewModel: EntryScreenViewModel = viewModel(factory = AppViewModelInitializer.Factory),
     navController: NavHostController
 ) {
-    var savedNote by rememberSaveable {
-        mutableStateOf(false)
-    }
+    val coroutineScope = rememberCoroutineScope()
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = remember {
         FocusRequester()
@@ -110,15 +109,13 @@ fun EntryScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.End)
                 ) {
-                    if (savedNote) {
-                        ShareButton {
-
-                        }
-                    }
                     SaveButton {
-                        savedNote = true
                         keyboardController?.hide()
                         focusManager.clearFocus(force = true)
+                        coroutineScope.launch {
+                            viewModel.saveNote()
+                        }
+                        navController.navigateUp()
                     }
                     Box {
                         MenuTagsButton {
@@ -131,11 +128,9 @@ fun EntryScreen(
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-            TitleField(modifier = Modifier, focusRequester = focusRequester) {
-
+            TitleField(noteDetails = viewModel.noteUiState.noteDetails, modifier = Modifier, focusRequester = focusRequester) {
+                viewModel.updateUiState(it)
             }
-
-
             Text(
                 text = "${time.dayOfMonth} ${getMonth(time.monthValue)} ${time.hour}:${time.minute}",
                 modifier = Modifier.padding(vertical = 4.dp),
@@ -143,21 +138,26 @@ fun EntryScreen(
                 fontWeight = FontWeight.Medium
             )
             Spacer(modifier = Modifier.height(8.dp))
-            NoteField(modifier = Modifier.fillMaxSize()) {
-
+            NoteField(noteDetails = viewModel.noteUiState.noteDetails, modifier = Modifier.fillMaxSize()) {
+                viewModel.updateUiState(it)
             }
         }
     }
 }
 
 @Composable
-fun NoteField(modifier: Modifier, noteUpdate: () -> Unit) {
+fun NoteField(noteDetails: NoteDetails, modifier: Modifier, noteUpdate: (NoteDetails) -> Unit) {
     var note by rememberSaveable {
         mutableStateOf("")
     }
     OutlinedTextField(
         value = note,
         onValueChange = {
+            noteUpdate(
+                noteDetails.copy(
+                    note = it
+                )
+            )
             note = it
         },
         label = { Text(text = "Note") },
@@ -168,12 +168,21 @@ fun NoteField(modifier: Modifier, noteUpdate: () -> Unit) {
 
 }
 @Composable
-fun TitleField (modifier: Modifier, focusRequester: FocusRequester, titleUpdate: () -> Unit) {
+fun TitleField(
+    noteDetails: NoteDetails,
+    modifier: Modifier,
+    focusRequester: FocusRequester,
+    titleUpdate: (NoteDetails) -> Unit
+) {
     var title by rememberSaveable { mutableStateOf("") }
     OutlinedTextField(
         value = title,
         onValueChange = {
-
+            titleUpdate(
+                noteDetails.copy(
+                    title = it
+                )
+            )
             title = it
         },
         label = { Text(text = "Title") },
@@ -238,6 +247,7 @@ fun SaveButton(saveNote: () -> Unit) {
     }
 }
 
+/*
 @Composable
 fun ShareButton(shareNote: () -> Unit) {
     FilledTonalIconButton(
@@ -251,6 +261,7 @@ fun ShareButton(shareNote: () -> Unit) {
         )
     }
 }
+*/
 private fun getMonth(mon: Int) : String {
     return when (mon) {
         1 -> "January"
