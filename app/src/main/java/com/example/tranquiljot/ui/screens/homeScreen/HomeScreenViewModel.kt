@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 class HomeScreenViewModel(
-    notesRepository: NotesRepository
+    private val notesRepository: NotesRepository
 ): ViewModel() {
     val homeUiState : StateFlow<HomeUiState> =
         notesRepository.getAllNotes().map {
@@ -21,10 +21,15 @@ class HomeScreenViewModel(
             HomeUiState()
         )
 
+    suspend fun deleteNote(id: Int) {
+        notesRepository.deleteNotes(id)
+    }
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
+
+
 }
 data class HomeUiState (
     val notes: List<Notes> = listOf()

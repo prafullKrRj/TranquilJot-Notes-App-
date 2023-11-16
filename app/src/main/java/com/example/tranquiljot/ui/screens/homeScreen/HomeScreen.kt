@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,9 +28,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -37,24 +38,27 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tranquiljot.R
 import com.example.tranquiljot.model.Notes
 import com.example.tranquiljot.ui.screens.AppViewModelInitializer
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -64,6 +68,7 @@ fun HomeScreen(
     navigateDetails: (Int) -> Unit,
 ) {
     val homeUiState: HomeUiState by viewModel.homeUiState.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
     Scaffold (
         topBar = {
             AppBar()
@@ -76,10 +81,15 @@ fun HomeScreen(
         modifier = Modifier.padding(16.dp)
     ) {paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
-            FilterRow()
-            HomeBody(noteList = homeUiState.notes) {
-                navigateDetails(it)
-            }
+          //  FilterRow()
+            Spacer(modifier = Modifier.height(16.dp))
+            HomeBody(noteList = homeUiState.notes, navigateDetails = {
+                                 navigateDetails(it)
+            } ,deleteCard = {
+                coroutineScope.launch {
+                    viewModel.deleteNote(it)
+                }
+            })
         }
     }
 }
@@ -88,8 +98,18 @@ fun HomeScreen(
  *
  *  Body of the home screen
  * */
+fun getNote(string: String) : String{
+    val arr = string.split(" ", "\n\n")
+    val usefulString = StringBuilder("")
+    for (i in arr) {
+        if (i != " ") {
+            usefulString.append(i).append(" ")
+        }
+    }
+    return usefulString.toString()
+}
 @Composable
-fun HomeBody(noteList: List<Notes>, navigateDetails: (Int) -> Unit = {}) {
+fun HomeBody(noteList: List<Notes>, navigateDetails: (Int) -> Unit = {}, deleteCard: (Int) -> Unit) {
     val visibleState = remember {
         MutableTransitionState(false).apply {
             targetState = true
@@ -104,16 +124,24 @@ fun HomeBody(noteList: List<Notes>, navigateDetails: (Int) -> Unit = {}) {
         LazyColumn {
             noteList.forEachIndexed { index, note ->
                 item {
-                    NoteCard(modifier = Modifier.animateEnterExit(
-                        enter = slideInVertically (
-                            animationSpec = spring(
-                                dampingRatio = DampingRatioLowBouncy,
-                                stiffness = StiffnessVeryLow
-                            ),
-                            initialOffsetY = {it * (index + 1)},
-                        )), note = note) {
-                        navigateDetails(note.id)
-                    }
+                    NoteCard(
+                        modifier = Modifier.animateEnterExit(
+                            enter = slideInVertically(
+                                animationSpec = spring(
+                                    dampingRatio = DampingRatioLowBouncy,
+                                    stiffness = StiffnessVeryLow
+                                ),
+                                initialOffsetY = { it * (index + 1) },
+                            )
+                        ),
+                        note = note,
+                        navigateDetails = {
+                                          navigateDetails(it)
+                        },
+                        deleteCard = {
+                            deleteCard(it)
+                        }
+                    )
                 }
             }
         }
@@ -121,7 +149,7 @@ fun HomeBody(noteList: List<Notes>, navigateDetails: (Int) -> Unit = {}) {
 }
 
 @Composable
-fun NoteCard(modifier: Modifier, note: Notes,navigateDetails: (Int) -> Unit = {}) {
+fun NoteCard(modifier: Modifier, note: Notes,navigateDetails: (Int) -> Unit = {}, deleteCard: (Int) -> Unit) {
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = colorScheme.primaryContainer,
@@ -139,9 +167,32 @@ fun NoteCard(modifier: Modifier, note: Notes,navigateDetails: (Int) -> Unit = {}
                 }
                 .padding(16.dp),
         ) {
-            Text(text = note.title, color = colorScheme.onPrimaryContainer)
-            Text(text = note.note, color = colorScheme.onPrimaryContainer)
-            Text(text = note.time, color = colorScheme.onPrimaryContainer)
+            Text(text = note.title, color = colorScheme.onPrimaryContainer, fontWeight = FontWeight.Medium, fontSize = 22.sp)
+            Divider(Modifier.padding(vertical = 6.dp))
+            Text(
+                text = if (getNote(note.note).length >= 110) getNote(note.note).substring(
+                    0,
+                    110
+                ) + "..." else getNote(note.note),
+                color = colorScheme.onPrimaryContainer
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Divider()
+
+            Row (Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Text(text = note.time, color = colorScheme.onPrimaryContainer, fontSize = 14.sp, fontWeight = FontWeight.Light)
+                IconButton(
+                    onClick = {
+                        deleteCard(note.id)
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Delete,
+                        contentDescription = "Delete",
+                        Modifier.size(18.dp)
+                    )
+                }
+            }
         }
     }
 }
@@ -188,41 +239,9 @@ fun FilterRow() {
         }
     }
     if (isFiltering) {
-            AlertDialog(
-                onDismissRequest = { isFiltering = false },
-                icon = { Icon(imageVector = Icons.Filled.Info, contentDescription = "Info") },
-                title = {
-                    Text(text = "Title")
-                },
-                text = {
-                    Text(
-                        "This area typically contains the supportive text " +
-                                "which presents the details regarding the Dialog's purpose."
-                    )
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            isFiltering = false
-                        }
-                    ) {
-                        Text("Confirm")
-                    }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = {
-                            isFiltering = false
-                        }
-                    ) {
-                        Text("Dismiss")
-                    }
-                }
-            )
+
     }
 }
-
-
 // App bar for the home screen
 @Composable
 fun AppBar() {

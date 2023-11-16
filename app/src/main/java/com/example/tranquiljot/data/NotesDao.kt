@@ -20,6 +20,8 @@ interface NotesDao {
     @Query("SELECT * FROM notes WHERE id = :id")
     fun getNotesById(id: Int): Flow<Notes>
 
+    @Query("DELETE FROM notes WHERE id = :id")
+    suspend fun deleteNote(id: Int)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertNotes(notes: Notes)
@@ -27,6 +29,4 @@ interface NotesDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateNotes(notes: Notes)
 
-    @Delete
-    suspend fun deleteNotes(notes: Notes)
 }

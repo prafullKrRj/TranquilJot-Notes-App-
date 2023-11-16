@@ -9,7 +9,7 @@ interface NotesRepository {
 
     suspend fun updateNotes(notes: Notes)
 
-    suspend fun deleteNotes(notes: Notes)
+    suspend fun deleteNotes(id: Int)
 
     fun getNotesById(id: Int) : Flow<Notes>
 }
@@ -22,7 +22,7 @@ class OfflineNotesRepository(
 
     override suspend fun updateNotes(notes: Notes) = notesDao.updateNotes(notes)
 
-    override suspend fun deleteNotes(notes: Notes) = notesDao.deleteNotes(notes)
+    override suspend fun deleteNotes(id: Int) = notesDao.deleteNote(id)
     override fun getNotesById(id: Int): Flow<Notes> = notesDao.getNotesById(id)
 
 }
