@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -122,20 +123,20 @@ fun HomeBody(noteList: List<Notes>, navigateDetails: (Int) -> Unit = {}) {
 @Composable
 fun NoteCard(modifier: Modifier, note: Notes,navigateDetails: (Int) -> Unit = {}) {
     ElevatedCard(
-        modifier = modifier
-            .padding(vertical = 8.dp)
-            .clickable {
-                navigateDetails(note.id)
-            },
         colors = CardDefaults.elevatedCardColors(
             containerColor = colorScheme.primaryContainer,
         ),
         shape = RoundedCornerShape(topStart = 24.dp, bottomStart = 24.dp, bottomEnd = 24.dp),
-
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        modifier = modifier
+            .padding(vertical = 8.dp),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .clickable {
+                    navigateDetails(note.id)
+                }
                 .padding(16.dp),
         ) {
             Text(text = note.title, color = colorScheme.onPrimaryContainer)
@@ -153,7 +154,9 @@ fun HomeFloatingActionButton(toEntry: () -> Unit) {
     FloatingActionButton(
         onClick = {
             toEntry()
-        }
+        },
+        containerColor = colorScheme.inversePrimary,
+        shape = CircleShape
     ) {
         Icon(
             imageVector = Icons.Default.Add,
