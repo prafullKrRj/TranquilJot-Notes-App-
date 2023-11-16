@@ -17,6 +17,10 @@ interface NotesDao {
     @Query("SELECT * FROM notes ORDER BY id DESC")
     fun getAllNotes(): Flow<List<Notes>>
 
+    @Query("SELECT * FROM notes WHERE id = :id")
+    fun getNotesById(id: Int): Flow<Notes>
+
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertNotes(notes: Notes)
 

@@ -126,7 +126,7 @@ fun NoteCard(modifier: Modifier, note: Notes,navigateDetails: (Int) -> Unit = {}
         colors = CardDefaults.elevatedCardColors(
             containerColor = colorScheme.primaryContainer,
         ),
-        shape = RoundedCornerShape(topStart = 24.dp, bottomStart = 24.dp, bottomEnd = 24.dp),
+        shape = RoundedCornerShape(topStart = 24.dp, bottomEnd = 24.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
         modifier = modifier
             .padding(vertical = 8.dp),
@@ -250,3 +250,9 @@ fun RoundIcon() {
         Image(painter = painterResource(id = R.drawable.notes), contentDescription = "Notes logo")      // TODO: Add logo
     }
 }
+
+
+
+
+
+

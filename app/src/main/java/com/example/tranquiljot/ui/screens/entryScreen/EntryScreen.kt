@@ -87,7 +87,6 @@ fun EntryScreen(
         ),
         exit = fadeOut()
     ) {
-
         Column(modifier = Modifier
             .padding(16.dp)
             .pointerInput(Unit) {
@@ -138,7 +137,7 @@ fun EntryScreen(
                 fontWeight = FontWeight.Medium
             )
             Spacer(modifier = Modifier.height(8.dp))
-            NoteField(noteDetails = viewModel.noteUiState.noteDetails, modifier = Modifier.fillMaxSize()) {
+            EntryNoteField(noteDetails = viewModel.noteUiState.noteDetails, modifier = Modifier.fillMaxSize()) {
                 viewModel.updateUiState(it)
             }
         }
@@ -146,7 +145,7 @@ fun EntryScreen(
 }
 
 @Composable
-fun NoteField(noteDetails: NoteDetails, modifier: Modifier, noteUpdate: (NoteDetails) -> Unit) {
+fun EntryNoteField(noteDetails: NoteDetails, modifier: Modifier, noteUpdate: (NoteDetails) -> Unit) {
     var note by rememberSaveable {
         mutableStateOf("")
     }
@@ -165,7 +164,6 @@ fun NoteField(noteDetails: NoteDetails, modifier: Modifier, noteUpdate: (NoteDet
         singleLine = false,
         shape = RoundedCornerShape(16.dp),
     )
-
 }
 @Composable
 fun TitleField(
@@ -247,21 +245,7 @@ fun SaveButton(saveNote: () -> Unit) {
     }
 }
 
-/*
-@Composable
-fun ShareButton(shareNote: () -> Unit) {
-    FilledTonalIconButton(
-        onClick = {
-            shareNote()
-        }
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.baseline_share_24),
-            contentDescription = "Share"
-        )
-    }
-}
-*/
+
 private fun getMonth(mon: Int) : String {
     return when (mon) {
         1 -> "January"

@@ -1,5 +1,7 @@
 package com.example.tranquiljot.ui
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
@@ -17,6 +19,7 @@ import com.example.tranquiljot.ui.screens.notesApplication
 enum class Screens {
     HOME, ENTRY, DETAILS
 }
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NavigationGraph(navController: NavHostController) {
     NavHost(navController = navController, startDestination = Screens.HOME.name) {
@@ -31,7 +34,7 @@ fun NavigationGraph(navController: NavHostController) {
             )
         }
         composable(route = Screens.DETAILS.name+"/{id}") {
-            DetailsScreen(viewModel = viewModel(factory = viewModelFactory {
+            DetailsScreen(navHostController = navController, viewModel = viewModel(factory = viewModelFactory {
                 initializer {
                     DetailsScreenViewModel(
                         notesRepository = notesApplication().container.notesRepository,

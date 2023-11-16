@@ -22,7 +22,7 @@ class EntryScreenViewModel(
     }
     private fun validateInput(uiState: NoteDetails = noteUiState.noteDetails) : Boolean {
         return with(uiState) {
-            title.isNotBlank() && note.isNotBlank()
+            title.isNotBlank() || note.isNotBlank()
         }
     }
 
@@ -41,7 +41,7 @@ data class NoteDetails(
     val id: Int = 0,
     val title:  String = "",
     val note: String = "",
-    val time: String = getTime(),
+    var time: String = getTime(),
 )
 fun NoteDetails.toNotes() : Notes {
     return Notes(
