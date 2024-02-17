@@ -1,7 +1,8 @@
 <h1 align="center" id="title">TranquilJot Notes</h1>
 
 <p id="description">This is a straightforward notes application designed to help users quickly jot down and organize their thoughts, ideas, and important information in a user-friendly interface.</p>
-
+<h2>Project Video</h2>
+[Watch the demo video](https://www.youtube.com/shorts/febmnllI7O4)
 <h2>Project Screenshots:</h2>
 <table>
   <tr>
